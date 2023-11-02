@@ -1,6 +1,16 @@
+use crate::action::Action;
 use clap::{arg, command, Command};
-
 pub struct Todo;
+
+impl Action for Todo {
+    fn add(&self, task: String) {
+        println!("Add: {}", task);
+    }
+
+    fn remove(&self, task: String) {
+        println!("Remove: {}", task);
+    }
+}
 
 impl Todo {
     pub fn run(&self) {
@@ -19,14 +29,21 @@ impl Todo {
             )
             .get_matches();
 
-        println!("{:?}", match_result.subcommand_name().unwrap());
-        println!(
-            "{:?}",
-            match_result
-                .subcommand_matches("add")
-                .unwrap()
-                .get_one::<String>("task")
-                .unwrap()
-        )
+        let action = match_result.subcommand_name();
+
+        match match_result
+            .subcommand_matches(action.unwrap())
+            .unwrap()
+            .get_one::<String>("task")
+        {
+            Some(task) => match action {
+                Some("add") => self.add(task.to_string()),
+                Some("remove") => self.remove(task.to_string()),
+                _ => {
+                    panic!("Command not found");
+                }
+            },
+            None => panic!("Task not found"),
+        };
     }
 }
