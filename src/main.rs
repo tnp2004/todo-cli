@@ -1,3 +1,5 @@
+use todo_cli::todo::Todo;
+
 fn main() {
-    println!("Hello, world!");
+    Todo.run();
 }

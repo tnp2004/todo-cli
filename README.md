@@ -1,5 +1,5 @@
 # Todo CLI
-just made for practice rust
+just made for practice Rust
 
 ## Checklist
 - [ ] show
