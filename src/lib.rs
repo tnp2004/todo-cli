@@ -1,3 +1,8 @@
 pub mod todo;
 pub mod action;
 pub mod file;
+pub mod error;
+
+pub use error::Error;
+
+pub type Result<T> = std::result::Result<T, Error>;
