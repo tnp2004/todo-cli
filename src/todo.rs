@@ -1,14 +1,20 @@
 use crate::action::Action;
+use crate::file::csv_sys;
 use clap::{arg, command, Command};
 pub struct Todo;
 
 impl Action for Todo {
-    fn add(&self, task: String) {
+    fn add(&self, task: String) -> Result<(), Box<csv::Error>> {
+        csv_sys::write(&task, &"todo_test.csv".to_string());
         println!("Add: {}", task);
+
+        Ok(())
     }
 
-    fn remove(&self, task: String) {
+    fn remove(&self, task: String) -> Result<(), Box<csv::Error>> {
         println!("Remove: {}", task);
+
+        Ok(())
     }
 }
 
@@ -30,7 +36,6 @@ impl Todo {
             .get_matches();
 
         let action = match_result.subcommand_name();
-
         match match_result
             .subcommand_matches(action.unwrap())
             .unwrap()
