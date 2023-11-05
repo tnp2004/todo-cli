@@ -1,4 +1,4 @@
-use todo_cli::todo::Todo;
+use todo_cli::command::Todo;
 
 fn main() {
     let todo = Todo::init();
