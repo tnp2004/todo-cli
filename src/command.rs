@@ -1,9 +1,8 @@
-
-use clap::{arg, command, Arg, Command, ArgMatches};
+use clap::{arg, command, Arg, ArgMatches, Command};
 
 use crate::error::Error;
 use crate::file::csv_system;
-use crate::{action::Action, action::ValueParser, Result};
+use crate::{action::Action, action::ArgParser, Result};
 pub struct Todo {
     pub header_fields: Vec<String>,
 }
@@ -41,15 +40,23 @@ impl Action for Todo {
     }
 }
 
-// impl ValueParser for ArgMatches {
-//     fn parse_arg(&self, action: &String, value: &String, path: Option<&String>) -> Result<&String> {
-//         Ok(self.get_one::<String>(value).unwrap())
-//     }
+impl ArgParser for ArgMatches {
+    fn parse_arg(&self, arg_name: &String) -> Result<&String> {
+        let arg_value = self.get_one::<String>(arg_name).unwrap();
 
-//     fn parse_arg_flag(&self, action: &String, value: &String, path: Option<&String>) -> Result<()> {
-//         todo!()
-//     }
-// }
+        Ok(arg_value)
+    }
+
+    fn parse_sub_arg(&self, action: &String, arg_name: &String) -> Result<&String> {
+        let arg_flag_value = self
+            .subcommand_matches(action)
+            .unwrap()
+            .get_one::<String>(arg_name)
+            .unwrap();
+
+        Ok(arg_flag_value)
+    }
+}
 
 impl Todo {
     pub fn init() -> Self {
@@ -63,14 +70,16 @@ impl Todo {
             // Add
             .subcommand(
                 Command::new("add")
+                    .about("Insert a new task")
                     .arg(arg!([task]))
-                    .about("Insert a new task"),
+                    .arg(Arg::new("path").short('p')),
             )
             // Remove
             .subcommand(
                 Command::new("remove")
+                    .about("Delete a task")
                     .arg(arg!([task]))
-                    .about("Delete a task"),
+                    .arg(Arg::new("path").short('p')),
             )
             // Show
             .subcommand(
@@ -80,36 +89,26 @@ impl Todo {
             )
             .get_matches();
 
-        let action = match_result.subcommand_name().unwrap();
-        println!("{}", action);
-
-        match match_result.subcommand_name() {
+        let action = match_result.subcommand_name();
+        match action {
             Some("add") => {
-                let task = match_result.get_one::<String>("task").unwrap();
-                let path = match_result
-                    .subcommand_matches(action)
-                    .unwrap()
-                    .get_one::<String>("path")
-                    .unwrap();
+                let task = match_result
+                    .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())?;
+                let path = match_result.parse_sub_arg(&"add".to_string(), &"path".to_string())?;
 
                 self.add(task, path)
             }
             Some("remove") => {
-                let task = match_result.get_one::<String>("task").unwrap();
-                let path = match_result
-                    .subcommand_matches(action)
-                    .unwrap()
-                    .get_one::<String>("path")
-                    .unwrap();
+                let task = match_result
+                    .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())?;
+                let path =
+                    match_result.parse_sub_arg(&"remove".to_string(), &"path".to_string())?;
 
                 self.remove(task, path)
             }
             Some("show") => {
-                let path = match_result
-                    .subcommand_matches(action)
-                    .unwrap()
-                    .get_one::<String>("path")
-                    .unwrap();
+                let path = match_result.parse_sub_arg(&"show".to_string(), &"path".to_string())?;
+
                 self.show(path)
             }
             _ => Err(Error::CommandNotFound),

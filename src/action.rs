@@ -6,7 +6,7 @@ pub trait Action {
     fn show(&self, path: &String) -> Result<(),Error>;
 }
 
-pub trait ValueParser {
-    fn parse_arg(&self, action: &String, value: &String, path: Option<&String>) -> Result<(), Error>;
-    fn parse_arg_flag(&self, action: &String, value: &String, path: Option<&String>) -> Result<(), Error>;
+pub trait ArgParser {
+    fn parse_arg(&self, arg_name: &String) -> Result<&String, Error>;
+    fn parse_sub_arg(&self, action: &String, arg_name: &String) -> Result<&String, Error>;
 }

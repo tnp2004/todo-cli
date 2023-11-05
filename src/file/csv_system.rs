@@ -16,10 +16,6 @@ pub fn read(path: &String) -> Result<Vec<StringRecord>, Error> {
     for result in reader.records() {
         let record = result?;
         records.push(record);
-        // get record
-        // for (i, field) in record.iter().enumerate() {
-        //     println!("{}: {}", i, field);
-        // }
     }
 
     Ok(records)
