@@ -2,8 +2,14 @@ use crate::error::Error;
 use csv::{Writer, Reader, StringRecord};
 
 pub fn write(task: &String, path: &String) -> Result<(), Error> {
+    let prev_records = read(path)?;
     let mut writer = Writer::from_path(path)?;
+    // header
     writer.write_record(&["task", "done"])?;
+    // rewrite previous records
+    for record in prev_records {
+        writer.write_record(&record)?;
+    }
     writer.write_record(&[task.to_string(), "false".to_string()])?;
     writer.flush()?;
 
