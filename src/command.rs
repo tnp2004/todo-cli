@@ -30,10 +30,17 @@ impl Action for Todo {
 
     fn show(&self, path: &String) -> Result<()> {
         let records = csv_system::read(path)?;
+        print!("    ");
+        self.header_fields.iter().for_each(|field| print!("{} ", field));
+        print!("\n");
+        let mut counter = 1;
         for record in records {
-            for (i, field) in record.iter().enumerate() {
-                println!("{}: {}", i, field);
+            print!("{}: ", counter);
+            for field in record.iter() {
+                print!(" {}", field);
             }
+            counter +=1;
+            print!("\n")
         }
 
         Ok(())
