@@ -31,7 +31,9 @@ impl Action for Todo {
     fn show(&self, path: &String) -> Result<()> {
         let records = csv_system::read(path)?;
         print!("    ");
-        self.header_fields.iter().for_each(|field| print!("{} ", field));
+        self.header_fields
+            .iter()
+            .for_each(|field| print!("{} ", field));
         print!("\n");
         let mut counter = 1;
         for record in records {
@@ -39,7 +41,7 @@ impl Action for Todo {
             for field in record.iter() {
                 print!(" {}", field);
             }
-            counter +=1;
+            counter += 1;
             print!("\n")
         }
 
@@ -74,26 +76,22 @@ impl Todo {
 
     pub fn run(&self) -> Result<()> {
         let match_result = command!()
+            // Path
+            .arg(Arg::new("path").short('p'))
             // Add
             .subcommand(
                 Command::new("add")
                     .about("Insert a new task")
-                    .arg(arg!([task]))
-                    .arg(Arg::new("path").short('p')),
+                    .arg(arg!([task])),
             )
             // Remove
             .subcommand(
                 Command::new("remove")
                     .about("Delete a task")
-                    .arg(arg!([task]))
-                    .arg(Arg::new("path").short('p')),
+                    .arg(arg!([task])),
             )
             // Show
-            .subcommand(
-                Command::new("show")
-                    .about("Print all tasks")
-                    .arg(Arg::new("path").short('p')),
-            )
+            .subcommand(Command::new("show").about("Print all tasks"))
             .get_matches();
 
         let action = match_result.subcommand_name();
@@ -101,20 +99,19 @@ impl Todo {
             Some("add") => {
                 let task = match_result
                     .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())?;
-                let path = match_result.parse_sub_arg(&"add".to_string(), &"path".to_string())?;
+                let path = match_result.parse_arg(&"path".to_string())?;
 
                 self.add(task, path)
             }
             Some("remove") => {
                 let task = match_result
                     .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())?;
-                let path =
-                    match_result.parse_sub_arg(&"remove".to_string(), &"path".to_string())?;
+                let path = match_result.parse_arg(&"path".to_string())?;
 
                 self.remove(task, path)
             }
             Some("show") => {
-                let path = match_result.parse_sub_arg(&"show".to_string(), &"path".to_string())?;
+                let path = match_result.parse_arg(&"path".to_string())?;
 
                 self.show(path)
             }
