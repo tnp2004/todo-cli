@@ -1,8 +1,8 @@
 use clap::{arg, command, Arg, ArgMatches, Command};
-
 use crate::error::Error;
 use crate::file::csv_system;
 use crate::{action::Action, action::ArgParser, Result};
+
 pub struct Todo {
     pub header_fields: Vec<String>,
 }
@@ -76,7 +76,7 @@ impl Todo {
 
     pub fn run(&self) -> Result<()> {
         let match_result = command!()
-            // Path
+            // Path argument
             .arg(Arg::new("path").short('p'))
             // Add
             .subcommand(

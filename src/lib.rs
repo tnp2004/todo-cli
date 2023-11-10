@@ -3,6 +3,7 @@ pub mod action;
 pub mod file;
 pub mod error;
 pub mod status;
+pub mod config;
 
 pub use error::Error;
 
