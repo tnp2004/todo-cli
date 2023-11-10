@@ -2,9 +2,9 @@
 just made for practice Rust
 
 ## Checklist
-- [ ] show
-- [ ] add
-- [ ] done
+- [x] show
+- [x] add
+- [ ] status
 - [ ] update
 - [ ] remove
 - [ ] import from CSV
