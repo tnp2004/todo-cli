@@ -8,25 +8,39 @@ pub trait TConfig {
 }
 
 pub struct Cfg {
-    path: String,
     builder: ConfigBuilder<DefaultState>,
+    cfg: HashMap<String, String>,
 }
 
 impl Cfg {
     pub fn init() -> Self {
         Self {
-            path: String::new(),
             builder: Config::builder(),
+            cfg: HashMap::new(),
         }
+    }
+
+    pub fn load_config(&mut self) -> Result<()> {
+        let config = self
+            .builder.clone()
+            .add_source(config::File::with_name("./Config"))
+            .add_source(config::Environment::with_prefix("APP"))
+            .build()
+            .unwrap();
+
+        self.cfg = config.try_deserialize::<HashMap<String, String>>().unwrap();
+
+        Ok(())
     }
 }
 
 impl TConfig for Cfg {
+
     fn set_path(&self, path_value: String) -> Result<()> {
-        Config::builder()
+        self.builder.clone()
             .set_override("path", path_value)
             .unwrap()
-            .add_source(config::File::with_name("./Settings"))
+            .add_source(config::File::with_name("./Config"))
             .build()
             .unwrap();
 
@@ -34,42 +48,7 @@ impl TConfig for Cfg {
     }
 
     fn get_path(&self) -> &String {
-        &self.path
+        self.cfg.get("path").unwrap()
     }
-}
 
-pub fn config() {
-    let mut settings = Config::builder()
-        // Add in `./Settings.toml`
-        .add_source(config::File::with_name("./Settings"))
-        // Add in settings from the environment (with a prefix of APP)
-        // Eg.. `APP_DEBUG=1 ./target/app` would set the `debug` key
-        .add_source(config::Environment::with_prefix("APP"))
-        .build()
-        .unwrap();
-
-    // Print out our settings (as a HashMap)
-    println!(
-        "{:?}",
-        settings
-            .try_deserialize::<HashMap<String, String>>()
-            .unwrap()
-    );
-
-    // let settings = Config::builder()
-    //     .set_override("name", "lol")
-    //     .unwrap()
-    //     // Add in `./Settings.toml`
-    //     .add_source(config::File::with_name("./Settings"))
-    //     .add_source(config::Environment::with_prefix("APP"))
-    //     .build()
-    //     .unwrap();
-
-    // println!(
-    //     "{:?}",
-    //     settings
-    //         .try_deserialize::<HashMap<String, String>>()
-    //         .unwrap()
-    //         .get("name")
-    // );
 }

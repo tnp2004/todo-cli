@@ -7,13 +7,6 @@ pub struct Todo {
     pub header_fields: Vec<String>,
 }
 
-// struct TodoHeader {
-//     task: String,
-//     done: bool,
-//     created_at: String,
-//     updated_at: String,
-// }
-
 impl Action for Todo {
     fn add(&self, task: &String, path: &String) -> Result<()> {
         csv_system::write(task, path)?;
