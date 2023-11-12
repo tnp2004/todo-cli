@@ -1,10 +1,12 @@
 use clap::{arg, command, Arg, ArgMatches, Command};
+use crate::config::{Cfg, TConfig};
 use crate::error::Error;
 use crate::file::csv_system;
 use crate::{action::Action, action::ArgParser, Result};
 
 pub struct Todo {
     pub header_fields: Vec<String>,
+    pub config: Cfg
 }
 
 impl Action for Todo {
@@ -43,10 +45,15 @@ impl Action for Todo {
 }
 
 impl ArgParser for ArgMatches {
-    fn parse_arg(&self, arg_name: &String) -> Result<&String> {
-        let arg_value = self.get_one::<String>(arg_name).unwrap();
+    fn parse_arg(&self, arg_name: &String) -> Result<Option<&String>> {
+        let arg_value = self.get_one::<String>(arg_name);
+      
+        if arg_value.is_none() {
+            return Err(Error::ArgumentNotFound);
+        }
 
         Ok(arg_value)
+
     }
 
     fn parse_sub_arg(&self, action: &String, arg_name: &String) -> Result<&String> {
@@ -61,8 +68,9 @@ impl ArgParser for ArgMatches {
 }
 
 impl Todo {
-    pub fn init() -> Self {
+    pub fn init(cfg: Cfg) -> Self {
         Self {
+            config: cfg,
             header_fields: vec!["task".to_string(), "done".to_string()],
         }
     }
@@ -94,19 +102,23 @@ impl Todo {
                     .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())?;
                 let path = match_result.parse_arg(&"path".to_string())?;
 
-                self.add(task, path)
+                self.add(task, path.unwrap())
             }
             Some("remove") => {
                 let task = match_result
                     .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())?;
                 let path = match_result.parse_arg(&"path".to_string())?;
 
-                self.remove(task, path)
+                self.remove(task, path.unwrap())
             }
             Some("show") => {
-                let path = match_result.parse_arg(&"path".to_string())?;
-
-                self.show(path)
+                match match_result.parse_arg(&"path".to_string()) {
+                    Ok(path) => self.show(path.unwrap()),
+                    Err(_) => {
+                        let path = self.config.get_path();
+                        self.show(path)
+                    }
+                }
             }
             _ => Err(Error::CommandNotFound),
         }?;

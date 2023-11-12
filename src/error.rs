@@ -5,6 +5,7 @@ use std::io;
 pub enum Error {
     TaskNotFound,
     CommandNotFound,
+    ArgumentNotFound,
     CsvError(String),
     IO(String),
 }
@@ -14,6 +15,7 @@ impl Display for Error {
         let message = match self {
             Self::TaskNotFound => "Task not found",
             Self::CommandNotFound => "Command not found",
+            Self::ArgumentNotFound => "Argument not found",
             Self::CsvError(e) => e,
             Self::IO(e) => e,
         };

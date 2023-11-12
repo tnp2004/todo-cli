@@ -8,13 +8,15 @@ pub trait TConfig {
 }
 
 pub struct Cfg {
+    filename: String,
     builder: ConfigBuilder<DefaultState>,
     cfg: HashMap<String, String>,
 }
 
 impl Cfg {
-    pub fn init() -> Self {
+    pub fn init(filename: String) -> Self {
         Self {
+            filename,
             builder: Config::builder(),
             cfg: HashMap::new(),
         }
@@ -23,7 +25,7 @@ impl Cfg {
     pub fn load_config(&mut self) -> Result<()> {
         let config = self
             .builder.clone()
-            .add_source(config::File::with_name("./Config"))
+            .add_source(config::File::with_name(&self.filename))
             .add_source(config::Environment::with_prefix("APP"))
             .build()
             .unwrap();
@@ -40,7 +42,7 @@ impl TConfig for Cfg {
         self.builder.clone()
             .set_override("path", path_value)
             .unwrap()
-            .add_source(config::File::with_name("./Config"))
+            .add_source(config::File::with_name(&self.filename))
             .build()
             .unwrap();
 
