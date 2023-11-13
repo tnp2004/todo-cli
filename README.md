@@ -4,7 +4,7 @@ just made for practice Rust
 ## Checklist
 - [x] show
 - [x] add
-- [ ] status
+- [x] status
 - [ ] update
 - [ ] remove
 - [ ] import from CSV
