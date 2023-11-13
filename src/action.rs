@@ -7,6 +7,6 @@ pub trait Action {
 }
 
 pub trait ArgParser {
-    fn parse_arg(&self, arg_name: &String) -> Result<Option<&String>, Error>;
-    fn parse_sub_arg(&self, action: &String, arg_name: &String) -> Result<&String, Error>;
+    fn parse_arg(&self, arg_name: &String) -> Option<&String>;
+    fn parse_sub_arg(&self, action: &String, arg_name: &String) -> Option<&String>;
 }

@@ -1,12 +1,12 @@
-use clap::{arg, command, Arg, ArgMatches, Command};
 use crate::config::{Cfg, TConfig};
 use crate::error::Error;
 use crate::file::csv_system;
 use crate::{action::Action, action::ArgParser, Result};
+use clap::{arg, command, Arg, ArgMatches, Command};
 
 pub struct Todo {
     pub header_fields: Vec<String>,
-    pub config: Cfg
+    pub config: Cfg,
 }
 
 impl Action for Todo {
@@ -45,25 +45,22 @@ impl Action for Todo {
 }
 
 impl ArgParser for ArgMatches {
-    fn parse_arg(&self, arg_name: &String) -> Result<Option<&String>> {
-        let arg_value = self.get_one::<String>(arg_name);
-      
-        if arg_value.is_none() {
-            return Err(Error::ArgumentNotFound);
+    fn parse_arg(&self, arg_name: &String) -> Option<&String> {
+        match self.get_one::<String>(arg_name) {
+            Some(arg_value) => Some(arg_value),
+            None => None,
         }
-
-        Ok(arg_value)
-
     }
 
-    fn parse_sub_arg(&self, action: &String, arg_name: &String) -> Result<&String> {
-        let arg_flag_value = self
+    fn parse_sub_arg(&self, action: &String, arg_name: &String) -> Option<&String> {
+        match self
             .subcommand_matches(action)
             .unwrap()
             .get_one::<String>(arg_name)
-            .unwrap();
-
-        Ok(arg_flag_value)
+        {
+            Some(flag_arg_value) => Some(flag_arg_value),
+            None => None,
+        }
     }
 }
 
@@ -97,28 +94,49 @@ impl Todo {
 
         let action = match_result.subcommand_name();
         match action {
+            // ADD
             Some("add") => {
-                let task = match_result
-                    .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())?;
-                let path = match_result.parse_arg(&"path".to_string())?;
+                let task = match match_result
+                    .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())
+                {
+                    Some(task) => task,
+                    None => return Err(Error::TaskNotFound),
+                };
 
-                self.add(task, path.unwrap())
+                let path = match match_result.parse_arg(&"path".to_string()) {
+                    Some(path) => path,
+                    None => self.config.get_path(),
+                };
+
+                self.add(task, path)
             }
+
+            // REMOVE
             Some("remove") => {
-                let task = match_result
-                    .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())?;
-                let path = match_result.parse_arg(&"path".to_string())?;
+                let task = match match_result
+                    .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())
+                {
+                    Some(task) => task,
+                    None => return Err(Error::TaskNotFound),
+                };
 
-                self.remove(task, path.unwrap())
+                let path = match match_result.parse_arg(&"path".to_string()) {
+                    Some(path) => path,
+                    None => self.config.get_path(),
+                };
+
+                self.remove(task, path)
             }
+
+            // SHOW
             Some("show") => {
-                match match_result.parse_arg(&"path".to_string()) {
-                    Ok(path) => self.show(path.unwrap()),
-                    Err(_) => {
-                        let path = self.config.get_path();
-                        self.show(path)
-                    }
-                }
+                let path = match match_result.parse_arg(&"path".to_string()) {
+                    Some(path) => path,
+                    // default path
+                    None => self.config.get_path(),
+                };
+
+                self.show(path)
             }
             _ => Err(Error::CommandNotFound),
         }?;
