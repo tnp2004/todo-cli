@@ -17,8 +17,9 @@ impl Action for Todo {
         Ok(())
     }
 
-    fn remove(&self, task: &String, _path: &String) -> Result<()> {
-        println!("Remove: {}", task);
+    fn remove(&self, n: i32, path: &String) -> Result<()> {
+        csv_system::delete(&self.header_fields, n, path)?;
+        println!("Remove: {}", n);
 
         Ok(())
     }
@@ -87,7 +88,7 @@ impl Todo {
             .subcommand(
                 Command::new("remove")
                     .about("Delete a task")
-                    .arg(arg!([task])),
+                    .arg(arg!([number])),
             )
             // Show
             .subcommand(Command::new("show").about("Print all tasks"))
@@ -114,10 +115,10 @@ impl Todo {
 
             // REMOVE
             Some("remove") => {
-                let task = match match_result
-                    .parse_sub_arg(&action.unwrap().to_string(), &"task".to_string())
+                let number = match match_result
+                    .parse_sub_arg(&action.unwrap().to_string(), &"number".to_string())
                 {
-                    Some(task) => task,
+                    Some(n) => n.parse::<i32>().unwrap(),
                     None => return Err(Error::TaskNotFound),
                 };
 
@@ -126,7 +127,7 @@ impl Todo {
                     None => self.config.get_path(),
                 };
 
-                self.remove(task, path)
+                self.remove(number, path)
             }
 
             // SHOW

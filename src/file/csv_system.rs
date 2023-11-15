@@ -19,6 +19,26 @@ pub fn write(header_fields: &Vec<String>,task: &String, path: &String) -> Result
     Ok(())
 }
 
+pub fn delete(header_fields: &Vec<String>, n: i32, path: &String) -> Result<(), Error> {
+    let prev_records = read(path)?;
+    let mut writer = Writer::from_path(path)?;
+    // header
+    writer.write_record(header_fields)?;
+    // rewrite previous records
+    for (i, record) in prev_records.iter().enumerate() {
+        
+        // skip the record to be deleted
+        if i as i32 + 1 == n {
+            continue;
+        }
+
+        writer.write_record(record)?;
+    }
+    writer.flush()?;
+
+    Ok(())
+}
+
 pub fn read(path: &String) -> Result<Vec<StringRecord>, Error> {
     let mut reader = Reader::from_path(path)?;
     let mut records: Vec<StringRecord> = Vec::new();
