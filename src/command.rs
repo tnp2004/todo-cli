@@ -26,16 +26,11 @@ impl Action for Todo {
     fn show(&self, path: &String) -> Result<()> {
         let records = csv_system::read(path)?;
         print!("    ");
-        self.header_fields
-            .iter()
-            .for_each(|field| print!("{} ", field));
-        print!("\n");
+        println!("{} {}", self.header_fields[1], self.header_fields[2]);
         let mut counter = 1;
         for record in records {
             print!("{}: ", counter);
-            for field in record.iter() {
-                print!(" {}", field);
-            }
+            print!(" {} {}", record[1].to_string(), record[2].to_string());
             counter += 1;
             print!("\n")
         }
@@ -71,7 +66,7 @@ impl Todo {
             header_fields: vec![
                 "id".to_string(),
                 "task".to_string(),
-                "done".to_string(),
+                "status".to_string(),
                 "created_at".to_string(),
                 "updated_at".to_string(),
             ],
