@@ -38,6 +38,15 @@ impl Action for Todo {
 
         Ok(())
     }
+
+    fn update_status(&self, number: i32, status: crate::status::Status, path: &String) -> std::prelude::v1::Result<(), Error> {
+        csv_system::update_status(&self.header_fields, number, status, path)?;
+        println!("Update status: {}", number);
+
+        Ok(())
+    }
+
+    
 }
 
 impl ArgParser for ArgMatches {

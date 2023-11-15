@@ -14,4 +14,17 @@ impl Status {
             Status::Cancelled => "cancelled".to_string(),
         }
     }
+
+   
 } 
+
+pub fn is_ok(status: &String) -> bool {
+    match status.as_str() {
+        "holding" => true,
+        "implement" => true,
+        "finished" => true,
+        "cancelled" => true,
+        _ => false,
+    }
+  
+}

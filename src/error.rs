@@ -6,6 +6,7 @@ pub enum Error {
     TaskNotFound,
     CommandNotFound,
     ArgumentNotFound,
+    StatusNotFound,
     CsvError(String),
     IO(String),
 }
@@ -16,6 +17,7 @@ impl Display for Error {
             Self::TaskNotFound => "Task not found",
             Self::CommandNotFound => "Command not found",
             Self::ArgumentNotFound => "Argument not found",
+            Self::StatusNotFound => "Status not found",
             Self::CsvError(e) => e,
             Self::IO(e) => e,
         };
