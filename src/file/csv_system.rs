@@ -1,16 +1,19 @@
 use crate::{error::Error, status::Status};
+use crate::utils::time;
+use uuid::Uuid;
 use csv::{Reader, StringRecord, Writer};
 
-pub fn write(task: &String, path: &String) -> Result<(), Error> {
+pub fn write(header_fields: &Vec<String>,task: &String, path: &String) -> Result<(), Error> {
     let prev_records = read(path)?;
     let mut writer = Writer::from_path(path)?;
     // header
-    writer.write_record(&["task", "status"])?;
+    writer.write_record(header_fields)?;
     // rewrite previous records
     for record in prev_records {
         writer.write_record(&record)?;
     }
-    writer.write_record(&[task.to_string(), Status::Holding.to_string()])?;
+    let id = Uuid::new_v4();
+    writer.write_record(&[id.to_string(), task.to_string(), Status::Holding.to_string(), time::current_time(), "no update".to_string()])?;
     writer.flush()?;
 
     Ok(())

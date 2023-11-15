@@ -11,7 +11,7 @@ pub struct Todo {
 
 impl Action for Todo {
     fn add(&self, task: &String, path: &String) -> Result<()> {
-        csv_system::write(task, path)?;
+        csv_system::write(&self.header_fields,task, path)?;
         println!("Add: {}", task);
 
         Ok(())
@@ -68,7 +68,13 @@ impl Todo {
     pub fn init(cfg: Cfg) -> Self {
         Self {
             config: cfg,
-            header_fields: vec!["task".to_string(), "done".to_string()],
+            header_fields: vec![
+                "id".to_string(),
+                "task".to_string(),
+                "done".to_string(),
+                "created_at".to_string(),
+                "updated_at".to_string(),
+            ],
         }
     }
 
