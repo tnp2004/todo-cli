@@ -1,6 +1,7 @@
 use crate::config::{Cfg, TConfig};
 use crate::error::Error;
 use crate::file::csv_system;
+use crate::status::Status;
 use crate::{action::Action, action::ArgParser, Result};
 use clap::{arg, command, Arg, ArgMatches, Command};
 
@@ -39,8 +40,16 @@ impl Action for Todo {
         Ok(())
     }
 
-    fn update_status(&self, number: i32, status: crate::status::Status, path: &String) -> std::prelude::v1::Result<(), Error> {
-        csv_system::update_status(&self.header_fields, number, status, path)?;
+    fn update_status(&self, number: i32, status: &String, path: &String) -> Result<()> {
+       let stat = match status as &str {
+        "holding" => Status::Holding,
+        "implement" => Status::Implement,
+        "finished" => Status::Finished,
+        "cancel" => Status::Cancelled,
+        _ => return Err(Error::StatusNotFound),
+    };
+        
+        csv_system::update_status(&self.header_fields, number, stat, path)?;
         println!("Update status: {}", number);
 
         Ok(())
@@ -99,6 +108,13 @@ impl Todo {
                     .about("Delete a task")
                     .arg(arg!([number])),
             )
+            // Update status
+            .subcommand(
+                Command::new("update")
+                    .about("Update status of a task")
+                    .arg(arg!([number]))
+                    .arg(arg!([status])),
+            )
             // Show
             .subcommand(Command::new("show").about("Print all tasks"))
             .get_matches();
@@ -148,6 +164,24 @@ impl Todo {
                 };
 
                 self.show(path)
+            }
+
+            // UPDATE STATUS
+            Some("update") => {
+                let path = match match_result.parse_arg(&"path".to_string()) {
+                    Some(path) => path,
+                    None => self.config.get_path(),
+                };
+                let n = match match_result.parse_sub_arg(&action.unwrap().to_string(),&"number".to_string()) {
+                    Some(n) => n.parse::<i32>().unwrap(),
+                    None => return Err(Error::TaskNotFound),
+                };
+                let status = match match_result.parse_sub_arg(&action.unwrap().to_string(),&"status".to_string()) {
+                    Some(stat) => stat,
+                    None => return Err(Error::StatusNotFound),
+                };
+
+                self.update_status(n, status, path)
             }
             _ => Err(Error::CommandNotFound),
         }?;

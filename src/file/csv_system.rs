@@ -1,5 +1,3 @@
-use std::f32::consts::E;
-
 use crate::{error::Error, status};
 use crate::utils::time;
 use uuid::Uuid;
