@@ -6,6 +6,6 @@ just made for practice Rust
 - [x] add
 - [x] status
 - [x] update
-- [ ] remove
+- [x] remove
 - [ ] import from CSV
 - [ ] export to CSV
