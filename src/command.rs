@@ -41,6 +41,7 @@ impl Action for Todo {
     }
 
     fn update_status(&self, number: i32, status: &String, path: &String) -> Result<()> {
+        // check and convert status to enum
        let stat = match status as &str {
         "holding" => Status::Holding,
         "implement" => Status::Implement,
