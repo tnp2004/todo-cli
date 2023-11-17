@@ -12,7 +12,7 @@ pub struct Todo {
 
 impl Action for Todo {
     fn add(&self, task: &String, path: &String) -> Result<()> {
-        csv_system::write(&self.header_fields,task, path)?;
+        csv_system::write(&self.header_fields, task, path)?;
         println!("Add: {}", task);
 
         Ok(())
@@ -42,21 +42,19 @@ impl Action for Todo {
 
     fn update_status(&self, number: i32, status: &String, path: &String) -> Result<()> {
         // check and convert status to enum
-       let stat = match status as &str {
-        "holding" => Status::Holding,
-        "implement" => Status::Implement,
-        "finished" => Status::Finished,
-        "cancel" => Status::Cancelled,
-        _ => return Err(Error::StatusNotFound),
-    };
-        
+        let stat = match status as &str {
+            "holding" => Status::Holding,
+            "implement" => Status::Implement,
+            "finished" => Status::Finished,
+            "cancel" => Status::Cancelled,
+            _ => return Err(Error::StatusNotFound),
+        };
+
         csv_system::update_status(&self.header_fields, number, stat, path)?;
-        println!("Update status: {}", number);
+        println!("Update status: {}", status);
 
         Ok(())
     }
-
-    
 }
 
 impl ArgParser for ArgMatches {
@@ -97,6 +95,12 @@ impl Todo {
         let match_result = command!()
             // Path argument
             .arg(Arg::new("path").short('p'))
+            // Set default path
+            .subcommand(
+                Command::new("setpath")
+                    .about("Set default path")
+                    .arg(arg!([path])),
+            )
             // Add
             .subcommand(
                 Command::new("add")
@@ -173,17 +177,33 @@ impl Todo {
                     Some(path) => path,
                     None => self.config.get_path(),
                 };
-                let n = match match_result.parse_sub_arg(&action.unwrap().to_string(),&"number".to_string()) {
+                let n = match match_result
+                    .parse_sub_arg(&action.unwrap().to_string(), &"number".to_string())
+                {
                     Some(n) => n.parse::<i32>().unwrap(),
                     None => return Err(Error::TaskNotFound),
                 };
-                let status = match match_result.parse_sub_arg(&action.unwrap().to_string(),&"status".to_string()) {
+                let status = match match_result
+                    .parse_sub_arg(&action.unwrap().to_string(), &"status".to_string())
+                {
                     Some(stat) => stat,
                     None => return Err(Error::StatusNotFound),
                 };
 
                 self.update_status(n, status, path)
             }
+
+            Some("setpath") => {
+                let path = match match_result.parse_sub_arg(&action.unwrap().to_string(),&"path".to_string()) {
+                    Some(path) => path,
+                    None => return Err(Error::ArgumentNotFound),
+                };
+
+                self.config.set_path(path.to_string())?;
+
+                Ok(())
+            }
+            
             _ => Err(Error::CommandNotFound),
         }?;
 
