@@ -122,6 +122,12 @@ impl Todo {
             )
             // Show
             .subcommand(Command::new("show").about("Print all tasks"))
+             // Export csv file
+             .subcommand(
+                Command::new("export")
+                    .about("Export csv file")
+                    .arg(arg!([path]))
+            )
             .get_matches();
 
         let action = match_result.subcommand_name();
@@ -200,6 +206,21 @@ impl Todo {
                 };
 
                 self.config.set_path(path.to_string())?;
+
+                Ok(())
+            }
+
+            Some("export") => {
+                let path = match match_result.parse_arg(&"path".to_string()) {
+                    Some(path) => path,
+                    None => self.config.get_path(),
+                };
+                let export_path = match match_result.parse_sub_arg(&action.unwrap().to_string(),&"path".to_string()) {
+                    Some(path) => path,
+                    None => return Err(Error::ArgumentNotFound),
+                };
+
+                println!("Exporting csv file to {}", export_path);
 
                 Ok(())
             }

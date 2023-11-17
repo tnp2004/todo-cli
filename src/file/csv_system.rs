@@ -1,5 +1,6 @@
+use std::fs::File;
 use crate::{error::Error, status};
-use crate::utils::time;
+use crate::utils::{time, self};
 use uuid::Uuid;
 use csv::{Reader, StringRecord, Writer};
 
@@ -71,6 +72,22 @@ pub fn update_status(header_fields: &Vec<String>, n: i32, status: status::Status
         }
 
         writer.write_record(record)?;
+    }
+    writer.flush()?;
+
+    Ok(())
+}
+
+pub fn export(header_fields: &Vec<String>,path: &String, export_path: &String) -> Result<(), Error> {
+    let mut reader = Reader::from_path(path)?;
+    let filename = format!("{}/{}", export_path, utils::filename::get_file_name());
+    File::create(&filename)?;
+    let mut writer = Writer::from_path(filename)?;
+     // header
+     writer.write_record(&[header_fields[1].clone(), header_fields[2].clone()])?;
+    for result in reader.records() {
+        let record = result?;
+        writer.write_record(&[record[1].to_string(), record[2].to_string()])?;
     }
     writer.flush()?;
 
