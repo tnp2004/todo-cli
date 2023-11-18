@@ -55,6 +55,15 @@ impl Action for Todo {
 
         Ok(())
     }
+
+    fn export(&self, path: &String, export_path: &String) -> Result<()> {
+        csv_system::export(&self.header_fields, path, export_path)?;
+        println!("Export csv file to {}", export_path);
+
+        Ok(())
+    }
+
+    
 }
 
 impl ArgParser for ArgMatches {
@@ -220,7 +229,8 @@ impl Todo {
                     None => return Err(Error::ArgumentNotFound),
                 };
 
-                println!("Exporting csv file to {}", export_path);
+                self.export(path, export_path)?;
+                
 
                 Ok(())
             }

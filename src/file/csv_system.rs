@@ -80,7 +80,7 @@ pub fn update_status(header_fields: &Vec<String>, n: i32, status: status::Status
 
 pub fn export(header_fields: &Vec<String>,path: &String, export_path: &String) -> Result<(), Error> {
     let mut reader = Reader::from_path(path)?;
-    let filename = format!("{}/{}", export_path, utils::filename::get_file_name());
+    let filename = format!("{}/{}",export_path, utils::filename::get_file_name());
     File::create(&filename)?;
     let mut writer = Writer::from_path(filename)?;
      // header

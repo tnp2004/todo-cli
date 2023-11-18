@@ -5,6 +5,7 @@ pub trait Action {
     fn remove(&self, number: i32, path: &String) -> Result<(), Error>;
     fn show(&self, path: &String) -> Result<(), Error>;
     fn update_status(&self, number: i32, status: &String, path: &String) -> Result<(), Error>;
+    fn export(&self, path: &String, export_path: &String) -> Result<(), Error>;
 }
 
 pub trait ArgParser {

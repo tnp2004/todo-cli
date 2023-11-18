@@ -26,7 +26,7 @@ pub fn get_time_name() -> String {
     let bangkok_time: DateTime<FixedOffset> = current_utc_time.with_timezone(&bangkok_offset);
 
     // Format the time for display
-    let formatted_time = bangkok_time.format("%Y/%m/%d-%H:%M:%S-%z");
+    let formatted_time = bangkok_time.format("%Y-%m-%d_%H-%M-%S");
 
     // Return the formatted time as a string
     formatted_time.to_string()
