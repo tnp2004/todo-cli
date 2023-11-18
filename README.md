@@ -7,5 +7,5 @@ just made for practice Rust
 - [x] status
 - [x] update
 - [x] remove
-- [ ] import from CSV
-- [ ] export to CSV
+- [ ] import from csv
+- [x] export to csv
