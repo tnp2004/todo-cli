@@ -1,4 +1,4 @@
-use todo_cli::{command::Todo, config::{self}};
+use todo_cli::{todo::Todo, config::{self}};
 
 fn main() {
     let mut cfg = config::Cfg::init("Config".to_string());
