@@ -7,6 +7,7 @@ pub enum Error {
     CommandNotFound,
     ArgumentNotFound,
     StatusNotFound,
+    ReadFileError,
     CsvError(String),
     IO(String),
 }
@@ -18,6 +19,7 @@ impl Display for Error {
             Self::CommandNotFound => "Command not found",
             Self::ArgumentNotFound => "Argument not found",
             Self::StatusNotFound => "Status not found",
+            Self::ReadFileError => "Read file error",
             Self::CsvError(e) => e,
             Self::IO(e) => e,
         };

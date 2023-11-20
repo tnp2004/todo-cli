@@ -47,6 +47,11 @@ pub fn read() -> ArgMatches {
                 .about("Export csv file")
                 .arg(arg!([path])),
         )
+        .subcommand(
+            Command::new("import")
+                .about("Import csv file")
+                .arg(arg!([path])),
+        )
         .get_matches()
 }
 
@@ -143,6 +148,21 @@ impl Comd for ArgMatches {
                 };
 
                 todo.export(path, export_path)?;
+
+                Ok(())
+            }
+
+            Some("import") => {
+                let import_path = match self.parse_sub_arg(&action.unwrap().to_string(),&"path".to_string()) {
+                    Some(path) => path,
+                    None => return Err(Error::ArgumentNotFound),
+                };
+                // let output_path = match self.parse_arg(&"path".to_string()) {
+                //     Some(path) => path,
+                //     None => todo.config.get_path(),
+                // };
+
+                todo.import(import_path, &".".to_string())?;
 
                 Ok(())
             }

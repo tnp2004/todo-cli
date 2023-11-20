@@ -56,7 +56,7 @@ pub fn update_status(header_fields: &Vec<String>, n: i32, status: status::Status
     let mut writer = Writer::from_path(path)?;
     // header
     writer.write_record(header_fields)?;
-    // rewrite previous records
+    
     for (i, record) in prev_records.iter().enumerate() {
         
         // update specific record
@@ -80,7 +80,7 @@ pub fn update_status(header_fields: &Vec<String>, n: i32, status: status::Status
 
 pub fn export(header_fields: &Vec<String>,path: &String, export_path: &String) -> Result<(), Error> {
     let mut reader = Reader::from_path(path)?;
-    let filename = format!("{}/{}",export_path, utils::filename::get_file_name());
+    let filename = format!("{}/Export-{}",export_path, utils::filename::get_file_name());
     File::create(&filename)?;
     let mut writer = Writer::from_path(filename)?;
      // header
@@ -88,6 +88,26 @@ pub fn export(header_fields: &Vec<String>,path: &String, export_path: &String) -
     for result in reader.records() {
         let record = result?;
         writer.write_record(&[record[1].to_string(), record[2].to_string()])?;
+    }
+    writer.flush()?;
+
+    Ok(())
+}
+
+pub fn import(header_fields: &Vec<String>, import_path: &String, output_path: &String) -> Result<(), Error> {
+    let import_records = match read(import_path) {
+        Ok(recs) => recs,
+        Err(_) => Err(Error::ReadFileError)?,
+    };
+    let filename = format!("{}/Import-{}",output_path, utils::filename::get_file_name());
+    File::create(&filename)?;
+    let mut writer = Writer::from_path(filename)?;
+    
+    writer.write_record(header_fields)?;
+    let id = Uuid::new_v4();
+
+    for record in import_records {
+        writer.write_record(&[id.to_string(), record[1].to_string(), record[2].to_string(), time::current_time(), "no update".to_string()])?;
     }
     writer.flush()?;
 

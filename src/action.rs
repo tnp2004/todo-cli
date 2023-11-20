@@ -10,6 +10,7 @@ pub trait Action {
     fn show(&self, path: &String) -> Result<()>;
     fn update_status(&self, number: i32, status: &String, path: &String) -> Result<()>;
     fn export(&self, path: &String, export_path: &String) -> Result<()>;
+    fn import(&self, import_path: &String, output_path: &String) -> Result<()>;
 }
 
 impl Action for Todo {
@@ -64,5 +65,15 @@ impl Action for Todo {
 
         Ok(())
     }
+
+    fn import(&self, import_path: &String, output_path: &String) -> Result<()> {
+        csv_system::import(&self.header_fields, import_path, output_path)?;
+        println!("Import csv file from {}", import_path);
+
+        Ok(())
+
+    }
+
+    
     
 }
