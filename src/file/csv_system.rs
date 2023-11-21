@@ -105,9 +105,9 @@ pub fn import(header_fields: &Vec<String>, import_path: &String, output_path: &S
     
     writer.write_record(header_fields)?;
     let id = Uuid::new_v4();
-
+    
     for record in import_records {
-        writer.write_record(&[id.to_string(), record[1].to_string(), record[2].to_string(), time::current_time(), "no update".to_string()])?;
+        writer.write_record(&[id.to_string(), record[0].to_string(), record[1].to_string(), time::current_time(), "no update".to_string()])?;
     }
     writer.flush()?;
 
