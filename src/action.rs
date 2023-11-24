@@ -3,6 +3,8 @@ use crate::file::csv_system;
 use crate::todo::Todo;
 use crate::status::Status;
 use crate::Result;
+use std::fs;
+use std::fs::File;
 
 pub trait Action {
     fn add(&self, task: &String, path: &String) -> Result<()>;
@@ -15,6 +17,11 @@ pub trait Action {
 
 impl Action for Todo {
     fn add(&self, task: &String, path: &String) -> Result<()> {
+        // create file if not exist
+        if let Err(_) = fs::metadata(path) {
+            File::create(path)?;
+        }
+      
         csv_system::write(&self.header_fields, task, path)?;
         println!("Add: {}", task);
 

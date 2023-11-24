@@ -14,12 +14,14 @@ pub fn read() -> ArgMatches {
     command!()
         // Path argument
         .arg(Arg::new("path").short('p'))
+
         // Set default path
-        .subcommand(
-            Command::new("setpath")
-                .about("Set default path")
-                .arg(arg!([path])),
-        )
+        // .subcommand(
+        //     Command::new("setpath")
+        //         .about("Set default path")
+        //         .arg(arg!([path])),
+        // )
+        
         // Add
         .subcommand(
             Command::new("add")
@@ -126,16 +128,16 @@ impl Comd for ArgMatches {
                 todo.update_status(n, status, path)
             }
 
-            Some("setpath") => {
-                let path = match self.parse_sub_arg(&action.unwrap().to_string(),&"path".to_string()) {
-                    Some(path) => path,
-                    None => return Err(Error::ArgumentNotFound),
-                };
+            // Some("setpath") => {
+            //     let path = match self.parse_sub_arg(&action.unwrap().to_string(),&"path".to_string()) {
+            //         Some(path) => path,
+            //         None => return Err(Error::ArgumentNotFound),
+            //     };
 
-                todo.config.set_path(path.to_string())?;
+            //     todo.config.set_path(path.to_string())?;
 
-                Ok(())
-            }
+            //     Ok(())
+            // }
 
             Some("export") => {
                 let path = match self.parse_arg(&"path".to_string()) {

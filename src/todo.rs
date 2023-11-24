@@ -23,7 +23,7 @@ impl Todo {
 
     pub fn run(&self) -> Result<()> {
         let command = comd::read();
-        command.match_command(&self)?;
+        command.match_command(self)?;
         
         Ok(())
     }

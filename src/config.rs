@@ -3,7 +3,7 @@ use config::{builder::DefaultState, Config, ConfigBuilder};
 use std::collections::HashMap;
 
 pub trait TConfig {
-    fn set_path(&self, path: String) -> Result<()>;
+    fn set_path(&mut self, path: String) -> Result<()>;
     fn get_path(&self) -> &String;
 }
 
@@ -26,25 +26,19 @@ impl Cfg {
         let config = self
             .builder.clone()
             .add_source(config::File::with_name(&self.filename))
-            .add_source(config::Environment::with_prefix("APP"))
-            .build()
-            .unwrap();
+            .add_source(config::Environment::with_prefix("APP"));
 
-        self.cfg = config.try_deserialize::<HashMap<String, String>>().unwrap();
+        self.builder = config.clone();
+        self.cfg = config.build().unwrap().try_deserialize::<HashMap<String, String>>().unwrap();
 
         Ok(())
     }
 }
 
 impl TConfig for Cfg {
-
-    fn set_path(&self, path_value: String) -> Result<()> {
-        self.builder.clone()
-            .set_override("path", path_value)
-            .unwrap()
-            .add_source(config::File::with_name(&self.filename))
-            .build()
-            .unwrap();
+    fn set_path(&mut self, path_value: String) -> Result<()> {
+        self.builder = self.builder.clone().set_override("path", path_value).unwrap();
+    //    self.cfg.insert("path".to_string(), path_value);
 
         Ok(())
     }
